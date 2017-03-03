@@ -37,6 +37,11 @@
             <argument name="name" xsi:type="const">SubscribePro\Service\Customer\CustomerService::NAME</argument>
         </arguments>
     </type>
+    <type name="Swarming\SubscribePro\Platform\Service\OauthToken">
+        <arguments>
+            <argument name="name" xsi:type="const">SubscribePro\Service\OauthToken\OauthTokenService::NAME</argument>
+        </arguments>
+    </type>
     <type name="Swarming\SubscribePro\Platform\Service\Subscription">
         <arguments>
             <argument name="name" xsi:type="const">SubscribePro\Service\Subscription\SubscriptionService::NAME</argument>
@@ -327,3 +332,4 @@
         </arguments>
     </type>
 </config>
+

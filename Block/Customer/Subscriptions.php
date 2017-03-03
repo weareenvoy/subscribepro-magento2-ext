@@ -13,6 +13,11 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     protected $customerRepository;
 
     /**
+     * @var \Swarming\SubscribePro\Platform\Service\OauthToken
+     */
+    protected $oauthTokenService;
+
+    /**
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
@@ -60,6 +65,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Swarming\SubscribePro\Platform\Service\OauthToken $oauthTokenService
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Swarming\SubscribePro\Ui\ConfigProvider\PriceConfig $priceConfigProvider
      * @param \Magento\Payment\Model\CcConfigProvider $ccConfigProvider
@@ -74,6 +80,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Swarming\SubscribePro\Platform\Service\OauthToken $oauthTokenService,
         \Magento\Customer\Model\Session $customerSession,
         \Swarming\SubscribePro\Ui\ConfigProvider\PriceConfig $priceConfigProvider,
         \Magento\Payment\Model\CcConfigProvider $ccConfigProvider,
@@ -83,10 +90,12 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         \Swarming\SubscribePro\Ui\ConfigProvider\SubscriptionConfig $subscriptionConfig,
         \Swarming\SubscribePro\Ui\ComponentProvider\AddressAttributes $addressAttributes,
         \Magento\Checkout\Block\Checkout\AttributeMerger $attributeMerger,
+        \Swarming\SubscribePro\Gateway\Config\ConfigProvider $gatewayConfigProvider,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->customerRepository = $customerRepository;
+        $this->oauthTokenService = $oauthTokenService;
         $this->customerSession = $customerSession;
         $this->priceConfigProvider = $priceConfigProvider;
         $this->ccConfigProvider = $ccConfigProvider;
@@ -112,6 +121,11 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         return $customerData;
     }
 
+    public function getApiAccessToken()
+    {
+        return $this->oauthTokenService->retrieveToken('johnspar1+johnjohnjohn@gmail.com');
+    }
+
     protected function _beforeToHtml()
     {
         $this->initJsLayout();
@@ -129,6 +143,11 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
             ->getFormatByCode(AddressConfig::DEFAULT_ADDRESS_FORMAT)
             ->getRenderer()
             ->renderArray($builtOutputAddressData);
+    }
+
+    protected function getSubscribeProConfig()
+    {
+        return $this->gatewayConfigProvider->getConfig();
     }
 
     protected function initJsLayout()
