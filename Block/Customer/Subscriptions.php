@@ -51,7 +51,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
      * @var \Swarming\SubscribePro\Ui\ConfigProvider\SubscriptionConfig
      */
     protected $subscriptionConfig;
-    
+
     /**
      * @var \Swarming\SubscribePro\Ui\ComponentProvider\AddressAttributes
      */
@@ -61,6 +61,11 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
      * @var \Magento\Checkout\Block\Checkout\AttributeMerger
      */
     protected $attributeMerger;
+
+    /**
+     * @var \Swarming\SubscribePro\Gateway\Config\ConfigProvider
+     */
+    protected  $gatewayConfigProvider;
 
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -75,6 +80,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
      * @param \Swarming\SubscribePro\Ui\ConfigProvider\SubscriptionConfig $subscriptionConfig
      * @param \Swarming\SubscribePro\Ui\ComponentProvider\AddressAttributes $addressAttributes
      * @param \Magento\Checkout\Block\Checkout\AttributeMerger $attributeMerger
+     * @param \Swarming\SubscribePro\Gateway\Config\ConfigProvider $gatewayConfigProvider
      * @param array $data
      */
     public function __construct(
@@ -107,42 +113,14 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         $this->attributeMerger = $attributeMerger;
     }
 
-    /**
-     * @return array
-     */
-    public function getCustomerData()
+    public function getSubscriptionWidgetConfiguration()
     {
-        $customer = $this->customerRepository->getById($this->customerSession->getCustomerId());
-        $customerData = $customer->__toArray();
-        foreach ($customer->getAddresses() as $key => $address) {
-            $customerData['addresses'][$key]['inline'] = $this->getCustomerAddressInline($address);
-        }
-
-        return $customerData;
-    }
-
-    public function getApiAccessToken()
-    {
-        return $this->oauthTokenService->retrieveToken('johnspar1+johnjohnjohn@gmail.com');
-    }
-
-    protected function _beforeToHtml()
-    {
-        $this->initJsLayout();
-        return parent::_beforeToHtml();
-    }
-
-    /**
-     * @param \Magento\Customer\Api\Data\AddressInterface $address
-     * @return string
-     */
-    protected function getCustomerAddressInline($address)
-    {
-        $builtOutputAddressData = $this->addressMapper->toFlatArray($address);
-        return $this->addressConfig
-            ->getFormatByCode(AddressConfig::DEFAULT_ADDRESS_FORMAT)
-            ->getRenderer()
-            ->renderArray($builtOutputAddressData);
+        return json_encode([
+            'apiAccessToken' => $this->oauthTokenService->retrieveToken('johnspar1+johnjohnjohn@gmail.com'),
+            'apiBaseUrl' => '',
+            'spreedlyEnvironmentKey' => '',
+            'customerId' => '',
+        ]);
     }
 
     protected function getSubscribeProConfig()
@@ -150,89 +128,4 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         return $this->gatewayConfigProvider->getConfig();
     }
 
-    protected function initJsLayout()
-    {
-        $data = [
-            'components' => [
-                'subscriptions-container' => [
-                    'children' => [
-                        'subscriptions' => [
-                            'config' => [
-                                'datepickerOptions' => [
-                                    'minDate' => SubscriptionOptions::QTY_MIN_DAYS_TO_NEXT_ORDER,
-                                    'showOn' => 'button',
-                                    'buttonImage' => $this->getViewFileUrl('Magento_Theme::calendar.png'),
-                                    'buttonText' => __('Click to change date'),
-                                    'buttonImageOnly' => true,
-                                    'dateFormat' => 'yyyy-mm-dd',
-                                ],
-                                'subscriptionConfig' => $this->subscriptionConfig->getConfig(),
-                                'priceConfig' => $this->priceConfigProvider->getConfig(),
-                                'paymentConfig' => [
-                                    'ccIcons' => $this->ccConfigProvider->getIcons(),
-                                    'ccTypesMapper' => $this->gatewayConfig->getCcTypesMapper()
-                                ],
-                                'shippingAddressOptions' => [
-                                    'dataScopePrefix' => 'shippingAddress',
-                                    'deps' => 'spAddressProvider',
-                                    'children' => [
-                                        'shipping-address-fieldset' => [
-                                            'children' => $this->attributeMerger->merge(
-                                                $this->addressAttributes->getElements(),
-                                                'spAddressProvider',
-                                                'shippingAddress',
-                                                [
-                                                    'region' => [
-                                                        'visible' => false,
-                                                    ],
-                                                    'region_id' => [
-                                                        'component' => 'Magento_Ui/js/form/element/region',
-                                                        'config' => [
-                                                            'template' => 'ui/form/field',
-                                                            'elementTmpl' => 'ui/form/element/select',
-                                                            'customEntry' => 'shippingAddress.region',
-                                                        ],
-                                                        'validation' => [
-                                                            'required-entry' => true,
-                                                        ],
-                                                        'filterBy' => [
-                                                            'target' => '${ $.provider }:${ $.parentScope }.country_id',
-                                                            'field' => 'country_id',
-                                                        ],
-                                                    ],
-                                                    'country_id' => [
-                                                        'sortOrder' => 115,
-                                                    ],
-                                                    'postcode' => [
-                                                        'component' => 'Magento_Ui/js/form/element/post-code',
-                                                        'validation' => [
-                                                            'required-entry' => true,
-                                                        ],
-                                                    ],
-                                                    'company' => [
-                                                        'validation' => [
-                                                            'min_text_length' => 0,
-                                                        ],
-                                                    ],
-                                                    'telephone' => [
-                                                        'config' => [
-                                                            'tooltip' => [
-                                                                'description' => __('For delivery questions.'),
-                                                            ],
-                                                        ],
-                                                    ],
-                                                ]
-                                            )
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        
-        $this->jsLayout = array_merge_recursive($this->jsLayout, $data);
-    }
 }
