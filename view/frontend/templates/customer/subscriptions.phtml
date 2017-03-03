@@ -9,9 +9,7 @@
 </div>
 
 <script>
-    window.customerData = <?php echo \Zend_Json::encode($block->getCustomerData()); ?>;
-console.log(window.customerData);
-    window.apiAccessToken = '<?php echo $block->getApiAccessToken(); ?>';
+    window.subscriptionWidgetConfig = '<?php echo $block->getSubscriptionWidgetConfiguration(); ?>';
 </script>
 
 <script src="http://10.2.1.145:8081/subscribepro-widgets.min.js"></script>
@@ -20,10 +18,10 @@ console.log(window.customerData);
     // Setup config for Subscribe Pro
     var widgetConfig = {
         widgetElementId: 'sp-widget-mysubscriptions',
-        apiBaseUrl: 'https://api.subscribepro.com',
-        apiAccessToken: window.apiAccessToken,
-        spreedlyEnvironmentKey: 'testtesttest',
-        customerId: '768421'
+        apiBaseUrl: window.subscriptionWidgetConfig.apiBaseUrl,
+        apiAccessToken: window.subscriptionWidgetConfig.apiAccessToken,
+        spreedlyEnvironmentKey: window.subscriptionWidgetConfig.spreedlyEnvironmentKey,
+        customerId: window.subscriptionWidgetConfig.customerId
     };
     // Call init
     subscribepro.widgets.init('mysubscriptions', widgetConfig);
