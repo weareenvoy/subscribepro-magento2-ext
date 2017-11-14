@@ -71,7 +71,7 @@ class Config
             return null;
         }
 
-        $config = unserialize($configData);
+        $config = json_decode($configData, true);
         $this->configByWebsite[$cacheKey] = $config;
 
         return $config;
@@ -93,7 +93,7 @@ class Config
         }
 
         $lifeTime = $lifeTime ?: $this->advancedConfig->getCacheLifeTime($websiteId);
-        return $this->cache->save(serialize($config), $cacheKey, [], $lifeTime);
+        return $this->cache->save(json_encode($config), $cacheKey, [], $lifeTime);
     }
 
     /**

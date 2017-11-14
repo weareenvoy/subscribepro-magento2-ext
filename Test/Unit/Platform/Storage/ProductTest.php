@@ -124,7 +124,7 @@ class ProductTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with($this->stringContains(ProductStorage::PRODUCT_CACHE_KEY . '_'))
-            ->willReturn(serialize($platformProductMock));
+            ->willReturn(json_encode($platformProductMock));
 
         $cachedProduct = $this->productStorage->load($sku, $websiteId);
 

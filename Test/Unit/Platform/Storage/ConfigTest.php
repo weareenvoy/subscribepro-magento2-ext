@@ -124,7 +124,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('load')
             ->with($cacheKey)
-            ->willReturn(serialize($configData));
+            ->willReturn(json_encode($configData));
 
         $this->assertEquals(
             $configData,
@@ -190,7 +190,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('save')
             ->with(
-                serialize($config),
+                json_encode($config),
                 $cacheKey,
                 [],
                 $lifeTime
@@ -225,7 +225,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->cacheMock->expects($this->once())
             ->method('save')
             ->with(
-                serialize($config),
+                json_encode($config),
                 $cacheKey,
                 [],
                 $lifeTime

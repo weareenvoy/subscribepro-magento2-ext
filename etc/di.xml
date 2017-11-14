@@ -241,6 +241,11 @@
             </argument>
         </arguments>
     </virtualType>
+    <type name="Swarming\SubscribePro\Gateway\Response\VaultDetailsHandler">
+        <arguments>
+            <argument name="paymentTokenFactory" xsi:type="object">Magento\Vault\Model\CreditCardTokenFactory</argument>
+        </arguments>
+    </type>
 
     <!-- VaultAuthorizeCommand -->
     <type name="Swarming\SubscribePro\Gateway\Command\VaultAuthorizeCommand">

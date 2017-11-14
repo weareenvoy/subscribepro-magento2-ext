@@ -72,7 +72,7 @@ class Product
             return null;
         }
 
-        $platformProduct = unserialize($platformProductData);
+        $platformProduct = json_decode($platformProductData, true);
         $this->platformProducts[$cacheKey] = $platformProduct;
 
         return $platformProduct;
@@ -94,7 +94,7 @@ class Product
         }
 
         $lifeTime = $lifeTime ?: $this->advancedConfig->getCacheLifeTime($websiteId);
-        $this->cache->save(serialize($platformProduct), $cacheKey, [], $lifeTime);
+        $this->cache->save(json_encode($platformProduct), $cacheKey, [], $lifeTime);
     }
 
     /**
@@ -122,6 +122,6 @@ class Product
     protected function getCacheKey($sku, $websiteId = null)
     {
         $websiteCode = $this->storeManager->getWebsite($websiteId)->getCode();
-        return self::PRODUCT_CACHE_KEY . '_' . md5(serialize([$sku, $websiteCode]));
+        return self::PRODUCT_CACHE_KEY . '_' . md5(json_encode([$sku, $websiteCode]));
     }
 }
