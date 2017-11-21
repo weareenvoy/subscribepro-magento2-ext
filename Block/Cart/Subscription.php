@@ -67,13 +67,26 @@ class Subscription extends \Magento\Checkout\Block\Cart\Additional\Info
      */
     protected function _beforeToHtml()
     {
-        if (!$this->generalConfig->isEnabled() || !$this->productHelper->isSubscriptionEnabled($this->getItem()->getProduct())) {
+        if (!$this->generalConfig->isEnabled() || !$this->productHelper->isSubscriptionEnabled($this->getProduct())) {
             $this->canRender = false;
         } else {
             $this->initJsLayout();
             $this->canRender = true;
         }
         return parent::_beforeToHtml();
+    }
+
+    /**
+     * Get item product or configurable child product
+     *
+     * @return \Magento\Catalog\Model\Product
+     */
+    protected function getProduct()
+    {
+        if($option = $this->getItem()->getOptionByCode('simple_product')){
+            return $option->getProduct();
+        }
+        return $this->getItem()->getProduct();
     }
 
     /**
@@ -133,7 +146,7 @@ class Subscription extends \Magento\Checkout\Block\Cart\Additional\Info
      */
     protected function getSubscriptionProduct()
     {
-        $sku = $this->getItem()->getProduct()->getData(ProductInterface::SKU);
+        $sku = $this->getProduct()->getData(ProductInterface::SKU);
         $subscriptionProduct = $this->platformProductManager->getProduct($sku);
 
         if ($intervalOption = $this->quoteItemHelper->getSubscriptionInterval($this->getItem())) {
